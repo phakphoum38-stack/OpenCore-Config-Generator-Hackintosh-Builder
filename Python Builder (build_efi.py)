@@ -1,0 +1,62 @@
+import yaml
+import plistlib
+import os
+
+CONFIG_PATH = "config/laptop_raptorlake.yml"
+OUTPUT = "output/EFI/OC/config.plist"
+
+def load_yaml():
+    with open(CONFIG_PATH, "r") as f:
+        return yaml.safe_load(f)
+
+def generate_config(data):
+
+    config = {
+        "ACPI": {
+            "Add": [{"Path": x} for x in data["acpi"]["add"]]
+        },
+
+        "Booter": {},
+
+        "Kernel": {
+            "Add": [{"BundlePath": k} for k in data["kexts"]]
+        },
+
+        "Misc": {
+            "Boot": {
+                "Timeout": data["boot"]["timeout"]
+            }
+        },
+
+        "NVRAM": {
+            "Add": {
+                "7C436110-AB2A-4BBB-A880-FE41995C9F82": {
+                    "boot-args": " ".join(data["boot"]["boot_args"])
+                }
+            }
+        },
+
+        "PlatformInfo": {
+            "Generic": {
+                "SystemProductName": data["platforminfo"]["smbios"]
+            }
+        }
+    }
+
+    return config
+
+
+def save_plist(config):
+    os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
+    with open(OUTPUT, "wb") as f:
+        plistlib.dump(config, f)
+
+
+def main():
+    data = load_yaml()
+    config = generate_config(data)
+    save_plist(config)
+    print("EFI config.plist created!")
+
+if __name__ == "__main__":
+    main()
