@@ -1,0 +1,44 @@
+system:
+  model: ASUS Vivobook X1504VA
+  cpu: Intel Core i3-1315U
+  generation: RaptorLake
+
+boot:
+  timeout: 5
+  picker: true
+  debug: false
+  boot_args:
+    - "-v"
+    - "keepsyms=1"
+    - "debug=0x100"
+
+acpi:
+  add:
+    - SSDT-EC-USBX.aml
+    - SSDT-PLUG-ALT.aml
+    - SSDT-AWAC.aml
+
+kexts:
+  - Lilu.kext
+  - VirtualSMC.kext
+  - WhateverGreen.kext
+  - AppleALC.kext
+  - IntelBluetoothFirmware.kext
+  - AirportItlwm.kext
+  - NVMeFix.kext
+
+drivers:
+  - OpenRuntime.efi
+  - OpenCanopy.efi
+  - HfsPlus.efi
+
+graphics:
+  igpu: UHD
+  spoof: AlderLake
+
+nvram:
+  csr-active-config: "00000000"
+  prev-lang:kbd: "en-US:0"
+
+platforminfo:
+  smbios: MacBookPro16,3
