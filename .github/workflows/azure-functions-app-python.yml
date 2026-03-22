@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  AZURE_FUNCTIONAPP_NAME: your-app-name
+  AZURE_FUNCTIONAPP_NAME: OpenCore-Config-Generator-Hackintosh-Builder
   AZURE_FUNCTIONAPP_PACKAGE_PATH: .
   PYTHON_VERSION: '3.9'
 
