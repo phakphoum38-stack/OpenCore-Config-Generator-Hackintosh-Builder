@@ -1,0 +1,1 @@
+# OpenCore-Config-Generator-Hackintosh-Builder
