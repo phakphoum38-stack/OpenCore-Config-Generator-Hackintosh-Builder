@@ -2,3 +2,18 @@ cpu: Intel Raptor Lake
 gpu: Intel
 wifi: Intel
 audio: Realtek
+import yaml
+
+with open("profiles/laptop_raptorlake.yml") as f:
+    hardware = yaml.safe_load(f)
+
+with open("profiles/laptop_raptorlake.yml", "r", encoding="utf-8") as f:
+    hardware = yaml.safe_load(f) or {}
+
+    from core.kext_manager import resolve_kexts
+
+kexts = resolve_kexts(hardware)
+print(kexts)
+
+    print(hardware)
+
