@@ -3,7 +3,6 @@ import zipfile
 import os
 import shutil
 
-# 🔽 ฟังก์ชันต้องมาก่อน
 def download_opencore():
     api_url = "https://api.github.com/repos/acidanthera/OpenCorePkg/releases/latest"
 
@@ -14,9 +13,20 @@ def download_opencore():
 
     print("⬇️ Downloading OpenCore...")
 
-    res = requests.get(api_url).json()
+    # ✅ ใช้ response ตัวเดียว
+    response = requests.get(api_url)
 
-    # หา zip
+    if response.status_code != 200:
+        print("❌ Failed to connect GitHub")
+        return
+
+    res = response.json()
+
+    if "assets" not in res:
+        print("❌ GitHub API error")
+        return
+
+    # 🔍 หา zip
     zip_url = None
     for asset in res.get("assets", []):
         if "RELEASE" in asset["name"] and asset["name"].endswith(".zip"):
@@ -30,7 +40,7 @@ def download_opencore():
     os.makedirs("resources", exist_ok=True)
     zip_path = "resources/opencore.zip"
 
-    # 🔽 download
+    # 📥 download
     with requests.get(zip_url, stream=True) as r:
         with open(zip_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
@@ -39,13 +49,13 @@ def download_opencore():
 
     print("✅ Download complete")
 
-    # 🔽 unzip
+    # 📦 unzip
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall("resources/")
 
     print("📦 Extracted OpenCore")
 
-    # 🔽 ย้าย X64
+    # 📂 ย้าย X64
     for folder in os.listdir("resources"):
         if folder.startswith("OpenCore"):
             src = os.path.join("resources", folder, "X64")
@@ -59,7 +69,3 @@ def download_opencore():
 
             print("✅ OpenCore ready at resources/OpenCore/X64")
             break
-
-
-# 🔥 เรียกใช้งาน “หลังประกาศฟังก์ชัน”
-download_opencore()
