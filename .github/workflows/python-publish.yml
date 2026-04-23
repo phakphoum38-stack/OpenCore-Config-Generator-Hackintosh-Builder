@@ -1,0 +1,30 @@
+name: Build EFI
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+
+    - name: Build EFI
+      run: python build_efi.py
+
+    - name: Upload EFI.zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: EFI
+        path: EFI.zip
