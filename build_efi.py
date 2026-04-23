@@ -1,51 +1,65 @@
-from core.kext_manager import resolve_kexts
-from core.config_generator import generate_config, generate_config_plist
-from core.validator import validate
-
+import requests
+import zipfile
 import os
 import shutil
 
-# 🔧 hardware (เดี๋ยวค่อยเปลี่ยนเป็น YAML ได้)
-hardware = {
-    "cpu": "Intel Raptor Lake",
-    "gpu": "Intel"
-}
+# 🔽 ฟังก์ชันต้องมาก่อน
+def download_opencore():
+    api_url = "https://api.github.com/repos/acidanthera/OpenCorePkg/releases/latest"
 
-# 🔧 สร้างโครง EFI
-def create_efi_structure():
-    paths = [
-        "EFI/OC",
-        "EFI/OC/Kexts",
-        "EFI/OC/ACPI",
-        "EFI/OC/Drivers"
-    ]
+    # 🔥 กันโหลดซ้ำ
+    if os.path.exists("resources/OpenCore/X64"):
+        print("⚡ OpenCore already exists, skip download")
+        return
 
-    for path in paths:
-        os.makedirs(path, exist_ok=True)
+    print("⬇️ Downloading OpenCore...")
 
-    print("✅ EFI folder structure created")
+    res = requests.get(api_url).json()
 
-# 🔧 zip EFI
-def zip_efi():
-    shutil.make_archive("EFI", 'zip', "EFI")
-    print("📦 EFI.zip created")
+    # หา zip
+    zip_url = None
+    for asset in res.get("assets", []):
+        if "RELEASE" in asset["name"] and asset["name"].endswith(".zip"):
+            zip_url = asset["browser_download_url"]
+            break
 
-# 🔥 process
-kexts = resolve_kexts(hardware)
-config = generate_config(hardware, kexts)
+    if not zip_url:
+        print("❌ OpenCore release not found")
+        return
 
-errors = validate(config)
+    os.makedirs("resources", exist_ok=True)
+    zip_path = "resources/opencore.zip"
 
-if errors:
-    print("❌ Error:", errors)
-else:
-    print("✅ EFI Ready")
+    # 🔽 download
+    with requests.get(zip_url, stream=True) as r:
+        with open(zip_path, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
 
-    # 👇 สำคัญมาก (ของคุณยังไม่มี)
-    create_efi_structure()
+    print("✅ Download complete")
 
-    # 👇 สร้าง config.plist
-    generate_config_plist(config)
+    # 🔽 unzip
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall("resources/")
 
-    # 👇 zip
-    zip_efi()
+    print("📦 Extracted OpenCore")
+
+    # 🔽 ย้าย X64
+    for folder in os.listdir("resources"):
+        if folder.startswith("OpenCore"):
+            src = os.path.join("resources", folder, "X64")
+            dst = "resources/OpenCore/X64"
+
+            if os.path.exists(dst):
+                shutil.rmtree(dst)
+
+            os.makedirs("resources/OpenCore", exist_ok=True)
+            os.rename(src, dst)
+
+            print("✅ OpenCore ready at resources/OpenCore/X64")
+            break
+
+
+# 🔥 เรียกใช้งาน “หลังประกาศฟังก์ชัน”
+download_opencore()
