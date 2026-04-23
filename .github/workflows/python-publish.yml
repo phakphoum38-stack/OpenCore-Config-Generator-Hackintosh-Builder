@@ -21,7 +21,7 @@ jobs:
       run: pip install -r requirements.txt
 
     - name: Build EFI
-      run: python build_efi.py
+      run: build_efi.py
 
     - name: Upload EFI.zip
       uses: actions/upload-artifact@v4
