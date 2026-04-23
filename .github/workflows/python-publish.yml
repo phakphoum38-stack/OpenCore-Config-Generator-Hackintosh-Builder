@@ -12,16 +12,27 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    # 🔍 debug ดูไฟล์ (ช่วยตอนพัง)
+    - name: List files
+      run: ls -R
+
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: "3.10"
 
     - name: Install Dependencies
-      run: pip install -r requirements.txt
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
+    # 🔥 ตรงนี้แก้สำคัญสุด
     - name: Build EFI
-      run: build_efi.py
+      run: python build_efi.py
+
+    # 🔥 เช็คว่ามีไฟล์จริงไหม
+    - name: Check EFI.zip
+      run: ls -lh EFI.zip
 
     - name: Upload EFI.zip
       uses: actions/upload-artifact@v4
