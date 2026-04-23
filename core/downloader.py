@@ -2,6 +2,7 @@ import requests
 import zipfile
 import os
 
+download_opencore()
 def download_opencore():
     print("⬇️ Downloading OpenCore...")
 
