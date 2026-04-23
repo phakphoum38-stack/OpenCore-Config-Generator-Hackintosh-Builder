@@ -1,11 +1,7 @@
-def generate_config(hardware, kexts):
-    config = {
-        "Booter": {},
-        "Kernel": {
-            "Add": kexts
-        },
-        "PlatformInfo": {
-            "SMBIOS": "MacBookPro16,1"
-        }
-    }
-    return config
+import plistlib
+
+def generate_config_plist(config: dict, output_path="EFI/OC/config.plist"):
+    with open(output_path, "wb") as f:
+        plistlib.dump(config, f)
+
+    print(f"✅ Generated: {output_path}")
